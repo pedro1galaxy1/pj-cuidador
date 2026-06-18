@@ -1,4 +1,10 @@
-node_modules/
+# Vercel
 .vercel
+
+# Dependencies
+node_modules/
+
+# OS / editor
 .DS_Store
+Thumbs.db
 *.log

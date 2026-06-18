@@ -1,1104 +1,256 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PJ Cuidador</title>
-<script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone@7.25.9/babel.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-<style>
-  :root{
-    --teal:#0e9488; --teal-d:#0b766c; --teal-l:#5eead4; --teal-bg:#effcfa;
-    --ink:#0f2620; --muted:#6b7d78; --line:#e3ece9; --bg:#f4f7f6;
-    --red:#dc2626; --red-bg:#fee2e2; --amber:#d97706; --green:#16a34a; --green-bg:#dcfce7;
-    --blue:#2563eb; --shadow:0 8px 30px rgba(7,40,35,.10);
-  }
-  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%}
-  body{font-family:'Inter',system-ui,sans-serif;background:#dbe7e4;color:var(--ink);
-    display:flex;align-items:center;justify-content:center;min-height:100vh}
-  #root{width:100%;display:flex;justify-content:center}
-  .phone{width:420px;max-width:100%;height:860px;max-height:100vh;background:var(--bg);
-    position:relative;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column}
-  @media(min-width:440px){.phone{border-radius:36px;height:880px;border:10px solid #0f2620}}
-  .scroll{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
-  .scroll::-webkit-scrollbar{width:0}
-  /* top bar */
-  .topbar{background:var(--teal);color:#fff;padding:16px 18px;display:flex;align-items:center;gap:12px;
-    position:sticky;top:0;z-index:20}
-  .topbar h1{font-size:18px;font-weight:700;flex:1}
-  .topbar .back{font-size:22px;cursor:pointer;width:30px}
-  .topbar .act{font-size:13px;font-weight:600;background:rgba(255,255,255,.18);padding:7px 12px;border-radius:20px;cursor:pointer}
-  /* content */
-  .pad{padding:18px}
-  .card{background:#fff;border-radius:18px;padding:16px;box-shadow:0 2px 10px rgba(7,40,35,.05);border:1px solid var(--line)}
-  .card+.card{margin-top:12px}
-  .row{display:flex;align-items:center;gap:12px}
-  .between{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .muted{color:var(--muted)}
-  .sec-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:22px 4px 10px}
-  .sec-title:first-child{margin-top:4px}
-  /* buttons */
-  .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:none;cursor:pointer;
-    background:var(--teal);color:#fff;font-weight:700;font-size:16px;padding:15px;border-radius:14px;font-family:inherit;transition:.15s}
-  .btn:active{transform:scale(.98)}
-  .btn.ghost{background:var(--teal-bg);color:var(--teal-d)}
-  .btn.line{background:#fff;color:var(--teal-d);border:1.5px solid var(--teal)}
-  .btn.sm{padding:10px 14px;font-size:14px;width:auto;border-radius:10px}
-  .btn.danger{background:var(--red-bg);color:var(--red)}
-  .pill{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:30px;font-size:12px;font-weight:600;background:var(--teal-bg);color:var(--teal-d)}
-  .pill.red{background:var(--red-bg);color:var(--red)}
-  .pill.green{background:var(--green-bg);color:var(--green)}
-  .pill.amber{background:#fef3c7;color:var(--amber)}
-  .pill.gray{background:#eef2f1;color:var(--muted)}
-  /* inputs */
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:var(--ink)}
-  .input,select,textarea{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:15px;
-    font-family:inherit;background:#fff;color:var(--ink);outline:none}
-  .input:focus,select:focus,textarea:focus{border-color:var(--teal)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  /* avatar */
-  .ava{width:46px;height:46px;border-radius:14px;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
-  .ava.lg{width:84px;height:84px;font-size:32px;border-radius:24px}
-  /* bottom nav */
-  .nav{display:flex;background:#fff;border-top:1px solid var(--line);padding:8px 4px 10px}
-  .nav button{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:3px;
-    font-size:10px;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;padding:4px}
-  .nav button.on{color:var(--teal)}
-  .nav .ic{font-size:21px}
-  .badge{position:absolute;top:-4px;right:50%;transform:translateX(16px);background:var(--red);color:#fff;font-size:9px;
-    min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 3px}
-  /* misc */
-  .listitem{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
-  .listitem:last-child{border-bottom:none}
-  .alertbar{background:var(--red-bg);border:1px solid #fecaca;color:var(--red);border-radius:14px;padding:13px 14px;display:flex;gap:10px;align-items:center;font-size:14px;font-weight:500}
-  .stepnum{width:26px;height:26px;border-radius:50%;background:var(--teal);color:#fff;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .check{width:26px;height:26px;border-radius:8px;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px;color:#fff;background:#fff}
-  .check.on{background:var(--green);border-color:var(--green)}
-  .fab{position:absolute;right:18px;bottom:84px;width:56px;height:56px;border-radius:50%;background:var(--teal);color:#fff;
-    font-size:28px;border:none;box-shadow:var(--shadow);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:15}
-  .tabs{display:flex;gap:6px;background:#eef2f1;padding:4px;border-radius:12px;margin-bottom:14px}
-  .tabs button{flex:1;border:none;background:none;padding:9px;border-radius:9px;font-weight:600;font-size:13px;color:var(--muted);cursor:pointer;font-family:inherit}
-  .tabs button.on{background:#fff;color:var(--teal-d);box-shadow:0 1px 4px rgba(0,0,0,.06)}
-  .chip{padding:7px 12px;border-radius:20px;background:#fff;border:1.5px solid var(--line);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap}
-  .chip.on{background:var(--teal);color:#fff;border-color:var(--teal)}
-  .scrollx{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
-  .scrollx::-webkit-scrollbar{height:0}
-  .prod{background:#fff;border-radius:16px;border:1px solid var(--line);overflow:hidden}
-  .prod .img{height:90px;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:40px}
-  .toast{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:#0f2620;color:#fff;padding:12px 20px;border-radius:30px;font-size:14px;font-weight:600;z-index:50;box-shadow:var(--shadow);white-space:nowrap}
-  .modal-bg{position:absolute;inset:0;background:rgba(7,40,35,.45);z-index:60;display:flex;align-items:flex-end}
-  .sheet{background:#fff;width:100%;border-radius:24px 24px 0 0;padding:22px 18px 28px;max-height:85%;overflow-y:auto}
-  .sheet h2{font-size:19px;margin-bottom:4px}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-  .scanning{animation:pulse 1s infinite}
-  /* print */
-  @media print{
-    body{background:#fff}
-    .phone{box-shadow:none;border:none;height:auto;width:100%}
-    .no-print{display:none!important}
-    #printArea{display:block!important}
-  }
-  #printArea{display:none}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="LegisCidade — Pesquise e consulte gratuitamente a legislação municipal de todo o Brasil: leis, decretos, portarias e o código tributário do seu município." />
+  <title>LegisCidade — Legislação Municipal do seu município</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div id="root">
-  <div id="loadErr" style="display:none;max-width:340px;margin:auto;padding:40px 24px;text-align:center;font-family:system-ui,sans-serif;color:#0f2620">
-    <div style="font-size:48px">📶</div>
-    <h2 style="margin:14px 0 8px;font-size:18px">Não foi possível carregar o app</h2>
-    <p style="font-size:14px;color:#6b7d78;line-height:1.5">O PJ Cuidador precisa de conexão com a internet para carregar (React e Babel via CDN). Verifique sua conexão e recarregue a página.</p>
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="container topbar__inner">
+      <span class="topbar__item">📞 0800 000 0000</span>
+      <span class="topbar__item">✉ contato@legiscidade.com.br</span>
+      <span class="topbar__spacer"></span>
+      <a href="#" class="topbar__link">Área do assinante</a>
+      <a href="#" class="topbar__link">Suporte</a>
+    </div>
   </div>
-</div>
-<script type="text/babel" data-presets="react">
-const {useState, useMemo, useEffect, useRef} = React;
 
-/* ============ MOCK DATA ============ */
-const PACIENTES_INIT = [
-  {id:1, nome:"Maria das Dores Silva", idade:78, foto:"👵", sexo:"Feminino",
-   condicoes:["Hipertensão","Diabetes tipo 2","Artrose"], alergias:["Dipirona","Penicilina"]},
-  {id:2, nome:"João Batista Souza", idade:84, foto:"👴", sexo:"Masculino",
-   condicoes:["Insuficiência cardíaca","DPOC"], alergias:["Nenhuma conhecida"]},
-];
+  <!-- Header -->
+  <header class="header">
+    <div class="container header__inner">
+      <a href="#" class="brand" aria-label="LegisCidade - página inicial">
+        <img src="assets/logo.svg" alt="LegisCidade" class="brand__logo" />
+        <span class="brand__text">
+          <strong>Legis</strong>Cidade
+          <small>Legislação Municipal</small>
+        </span>
+      </a>
 
-const MEDS_INIT = [
-  {id:1, pacienteId:1, nome:"Losartana", dosagem:"50mg", via:"Oral", forma:"Comprimido",
-   horarios:["08:00","20:00"], obs:"Para pressão alta. Tomar com água.",
-   passos:["Lave bem as mãos antes de manipular o medicamento.","Confira o nome e a dosagem na cartela.","Ofereça um copo de água ao paciente.","Coloque o comprimido na boca e peça para engolir com água.","Confirme que o comprimido foi engolido.","Registre a administração no app."],
-   tomado:{}},
-  {id:2, pacienteId:1, nome:"Metformina", dosagem:"850mg", via:"Oral", forma:"Comprimido",
-   horarios:["08:00","12:00","20:00"], obs:"Para diabetes. Tomar junto às refeições.",
-   passos:["Lave as mãos.","Verifique se o paciente vai se alimentar agora.","Ofereça o comprimido durante ou logo após a refeição.","Ofereça água para engolir.","Registre no app."],
-   tomado:{}},
-  {id:3, pacienteId:1, nome:"Insulina NPH", dosagem:"10 UI", via:"Subcutânea", forma:"Injetável",
-   horarios:["07:00","22:00"], obs:"Aplicar antes do café e antes de dormir. Manter refrigerada.",
-   passos:["Lave bem as mãos.","Retire a insulina da geladeira 15 min antes.","Role o frasco entre as mãos (não agite).","Higienize o local de aplicação com algodão e álcool.","Faça uma prega na pele e aplique em ângulo de 90°.","Descarte a agulha no recipiente apropriado.","Registre a aplicação."],
-   tomado:{}},
-  {id:4, pacienteId:2, nome:"Furosemida", dosagem:"40mg", via:"Oral", forma:"Comprimido",
-   horarios:["08:00"], obs:"Diurético. Dar pela manhã para não atrapalhar o sono.",
-   passos:["Lave as mãos.","Confira nome e dose.","Ofereça com água.","Registre no app."],
-   tomado:{}},
-  {id:5, pacienteId:2, nome:"Salbutamol (spray)", dosagem:"2 jatos", via:"Inalatória", forma:"Spray",
-   horarios:["08:00","14:00","20:00"], obs:"Para falta de ar. Agitar antes de usar.",
-   passos:["Agite bem o frasco.","Peça ao paciente para expirar todo o ar.","Posicione o bocal e pressione 1 jato enquanto ele inspira lentamente.","Peça para prender a respiração por 10 segundos.","Aguarde 30s e repita para o 2º jato.","Higienize a boca do paciente."],
-   tomado:{}},
-];
+      <nav class="nav" id="nav">
+        <a href="#inicio" class="nav__link">Início</a>
+        <a href="#recursos" class="nav__link">Recursos</a>
+        <a href="#cidades" class="nav__link">Cidades</a>
+        <a href="#planos" class="nav__link">Planos</a>
+        <a href="#contato" class="nav__link">Contato</a>
+        <a href="#" class="btn btn--outline nav__cta">Entrar</a>
+      </nav>
 
-const VITAIS_INIT = [
-  {id:1, pacienteId:1, tipo:"Pressão arterial", valor:"145/95", unidade:"mmHg", data:"2026-06-11 08:10", alerta:true},
-  {id:2, pacienteId:1, tipo:"Glicemia", valor:"180", unidade:"mg/dL", data:"2026-06-11 08:12", alerta:true},
-  {id:3, pacienteId:1, tipo:"Temperatura", valor:"36.5", unidade:"°C", data:"2026-06-11 08:15", alerta:false},
-  {id:4, pacienteId:1, tipo:"Freq. cardíaca", valor:"78", unidade:"bpm", data:"2026-06-11 08:16", alerta:false},
-  {id:5, pacienteId:1, tipo:"Saturação", valor:"97", unidade:"%", data:"2026-06-11 08:16", alerta:false},
-  {id:6, pacienteId:1, tipo:"Pressão arterial", valor:"138/88", unidade:"mmHg", data:"2026-06-10 08:05", alerta:false},
-  {id:7, pacienteId:1, tipo:"Glicemia", valor:"142", unidade:"mg/dL", data:"2026-06-10 08:06", alerta:false},
-  {id:8, pacienteId:1, tipo:"Pressão arterial", valor:"132/85", unidade:"mmHg", data:"2026-06-09 08:00", alerta:false},
-  {id:9, pacienteId:1, tipo:"Glicemia", valor:"155", unidade:"mg/dL", data:"2026-06-09 08:01", alerta:false},
-  {id:10, pacienteId:1, tipo:"Pressão arterial", valor:"150/98", unidade:"mmHg", data:"2026-06-08 08:00", alerta:true},
-];
-
-const PRODUTOS = [
-  {id:1, nome:"Aparelho de Pressão Digital", preco:189.90, emoji:"🩺", cat:"Equipamentos", farm:"Farmácia Saúde+"},
-  {id:2, nome:"Tiras p/ Glicemia (50un)", preco:79.90, emoji:"🩸", cat:"Diabetes", farm:"DrogaVida"},
-  {id:3, nome:"Oxímetro de Dedo", preco:99.00, emoji:"📟", cat:"Equipamentos", farm:"Farmácia Saúde+"},
-  {id:4, nome:"Fralda Geriátrica (G) 8un", preco:34.50, emoji:"🧷", cat:"Cuidados", farm:"DrogaVida"},
-  {id:5, nome:"Termômetro Digital", preco:29.90, emoji:"🌡️", cat:"Equipamentos", farm:"Farmácia Saúde+"},
-  {id:6, nome:"Álcool em Gel 500ml", preco:14.90, emoji:"🧴", cat:"Higiene", farm:"DrogaVida"},
-  {id:7, nome:"Caixa Organizadora de Comprimidos", preco:24.90, emoji:"💊", cat:"Cuidados", farm:"Farmácia Saúde+"},
-  {id:8, nome:"Seringa Insulina 1ml (10un)", preco:19.90, emoji:"💉", cat:"Diabetes", farm:"DrogaVida"},
-];
-
-const VITAL_TIPOS = [
-  {nome:"Pressão arterial", unidade:"mmHg", ph:"Ex: 120/80", icon:"🫀"},
-  {nome:"Temperatura", unidade:"°C", ph:"Ex: 36.5", icon:"🌡️"},
-  {nome:"Freq. cardíaca", unidade:"bpm", ph:"Ex: 75", icon:"💓"},
-  {nome:"Glicemia", unidade:"mg/dL", ph:"Ex: 110", icon:"🩸"},
-  {nome:"Saturação", unidade:"%", ph:"Ex: 98", icon:"🫁"},
-];
-
-/* Avalia se um sinal vital está fora do padrão */
-function avaliarVital(tipo, valor){
-  try{
-    if(tipo==="Pressão arterial"){
-      const [s,d] = valor.split("/").map(n=>parseInt(n));
-      if(s>=140||d>=90) return {alerta:true, msg:"Pressão elevada (hipertensão)"};
-      if(s<90||d<60) return {alerta:true, msg:"Pressão baixa (hipotensão)"};
-      return {alerta:false, msg:"Dentro do esperado"};
-    }
-    const n = parseFloat(valor.replace(",","."));
-    if(tipo==="Temperatura"){
-      if(n>=37.8) return {alerta:true, msg:"Febre"};
-      if(n<35) return {alerta:true, msg:"Hipotermia"};
-      return {alerta:false, msg:"Temperatura normal"};
-    }
-    if(tipo==="Freq. cardíaca"){
-      if(n>100) return {alerta:true, msg:"Taquicardia"};
-      if(n<50) return {alerta:true, msg:"Bradicardia"};
-      return {alerta:false, msg:"Frequência normal"};
-    }
-    if(tipo==="Glicemia"){
-      if(n>=160) return {alerta:true, msg:"Glicemia alta (hiperglicemia)"};
-      if(n<70) return {alerta:true, msg:"Glicemia baixa (hipoglicemia)"};
-      return {alerta:false, msg:"Glicemia normal"};
-    }
-    if(tipo==="Saturação"){
-      if(n<92) return {alerta:true, msg:"Saturação baixa"};
-      return {alerta:false, msg:"Saturação normal"};
-    }
-  }catch(e){}
-  return {alerta:false, msg:"Registrado"};
-}
-
-const iniciais = (nome)=> nome.split(" ").filter(Boolean).slice(0,2).map(p=>p[0]).join("").toUpperCase();
-
-/* ============ APP ============ */
-function App(){
-  const [logged, setLogged] = useState(false);
-  const [seenOnboard, setSeenOnboard] = useState(false);
-  const [tab, setTab] = useState("home");           // bottom nav
-  const [stack, setStack] = useState([]);           // overlay screens [{name, params}]
-  const [toast, setToast] = useState(null);
-
-  const [pacientes, setPacientes] = useState(PACIENTES_INIT);
-  const [meds, setMeds] = useState(MEDS_INIT);
-  const [vitais, setVitais] = useState(VITAIS_INIT);
-  const [pacienteAtivo, setPacienteAtivo] = useState(1);
-  const [cart, setCart] = useState([]);
-
-  const push = (name, params={})=> setStack(s=>[...s,{name,params}]);
-  const pop = ()=> setStack(s=>s.slice(0,-1));
-  const showToast = (m)=>{ setToast(m); setTimeout(()=>setToast(null), 2200); };
-
-  const ctx = {pacientes,setPacientes, meds,setMeds, vitais,setVitais,
-    pacienteAtivo,setPacienteAtivo, cart,setCart, push,pop, showToast, setTab};
-
-  if(!logged){
-    return <Phone>
-      {!seenOnboard
-        ? <Onboarding onDone={()=>setSeenOnboard(true)} />
-        : <Login onLogin={()=>setLogged(true)} />}
-    </Phone>;
-  }
-
-  const current = stack[stack.length-1];
-
-  return <Phone>
-    {!current && <>
-      <div className="scroll">
-        {tab==="home" && <Dashboard ctx={ctx} />}
-        {tab==="meds" && <Medicacoes ctx={ctx} />}
-        {tab==="vitais" && <VitaisHome ctx={ctx} />}
-        {tab==="loja" && <Loja ctx={ctx} />}
-        {tab==="pacientes" && <Pacientes ctx={ctx} />}
-      </div>
-      <BottomNav tab={tab} setTab={setTab} cartCount={cart.reduce((a,c)=>a+c.qtd,0)} />
-    </>}
-
-    {current && <Router screen={current} ctx={ctx} />}
-    {toast && <div className="toast">{toast}</div>}
-  </Phone>;
-}
-
-function Phone({children}){ return <div className="phone">{children}</div>; }
-
-function Router({screen, ctx}){
-  const p = screen.params;
-  switch(screen.name){
-    case "novoPaciente": return <FormPaciente ctx={ctx} paciente={p.paciente} />;
-    case "ocr": return <OCR ctx={ctx} />;
-    case "detalheMed": return <DetalheMed ctx={ctx} medId={p.medId} />;
-    case "novaMed": return <FormMed ctx={ctx} med={p.med} />;
-    case "registrarVital": return <RegistrarVital ctx={ctx} />;
-    case "historicoVital": return <HistoricoVital ctx={ctx} />;
-    case "cronograma": return <Cronograma ctx={ctx} />;
-    case "carrinho": return <Carrinho ctx={ctx} />;
-    default: return null;
-  }
-}
-
-/* ============ TOP BAR ============ */
-function Top({title, onBack, action}){
-  return <div className="topbar no-print">
-    {onBack && <span className="back" onClick={onBack}>‹</span>}
-    <h1>{title}</h1>
-    {action && <span className="act" onClick={action.onClick}>{action.label}</span>}
-  </div>;
-}
-
-/* ============ ONBOARDING ============ */
-function Onboarding({onDone}){
-  const [i,setI]=useState(0);
-  const slides=[
-    {icon:"💊", t:"Nunca esqueça uma medicação", d:"Receba lembretes automáticos dos horários de cada remédio do seu paciente. O app organiza tudo para você."},
-    {icon:"📷", t:"Cadastro sem digitação", d:"Fotografe a receita médica e nossa IA identifica automaticamente os medicamentos, doses e horários."},
-    {icon:"🫀", t:"Monitore os sinais vitais", d:"Registre pressão, glicemia, temperatura e mais. O app avisa na hora se algum valor estiver fora do normal."},
-    {icon:"📊", t:"Acompanhe a evolução", d:"Veja gráficos, histórico completo e imprima o cronograma de cuidados quando precisar."},
-  ];
-  const s=slides[i];
-  const last = i===slides.length-1;
-  return <div style={{height:"100%",display:"flex",flexDirection:"column",background:"linear-gradient(160deg,#0e9488,#0b766c)",color:"#fff"}}>
-    <div style={{textAlign:"right",padding:18}}>
-      <span style={{opacity:.85,fontWeight:600,cursor:"pointer"}} onClick={onDone}>Pular</span>
-    </div>
-    <div style={{flex:1,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"0 32px",textAlign:"center"}}>
-      <div style={{fontSize:96,marginBottom:30}}>{s.icon}</div>
-      <h1 style={{fontSize:26,fontWeight:800,marginBottom:14,lineHeight:1.2}}>{s.t}</h1>
-      <p style={{fontSize:16,lineHeight:1.5,opacity:.92}}>{s.d}</p>
-    </div>
-    <div style={{padding:"0 32px 40px"}}>
-      <div style={{display:"flex",gap:7,justifyContent:"center",marginBottom:26}}>
-        {slides.map((_,k)=><div key={k} style={{width:k===i?22:8,height:8,borderRadius:4,background:k===i?"#fff":"rgba(255,255,255,.4)",transition:".3s"}}/>)}
-      </div>
-      <button className="btn" style={{background:"#fff",color:"#0b766c"}}
-        onClick={()=> last? onDone() : setI(i+1)}>
-        {last? "Começar agora" : "Próximo"}
+      <button class="nav__toggle" id="navToggle" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
       </button>
     </div>
-  </div>;
-}
+  </header>
 
-/* ============ LOGIN ============ */
-function Login({onLogin}){
-  const [cadastro,setCadastro]=useState(false);
-  return <div style={{height:"100%",display:"flex",flexDirection:"column",overflowY:"auto"}}>
-    <div style={{background:"linear-gradient(160deg,#0e9488,#0b766c)",color:"#fff",padding:"56px 30px 40px",borderRadius:"0 0 32px 32px",textAlign:"center"}}>
-      <div style={{fontSize:60}}>🩺</div>
-      <h1 style={{fontSize:30,fontWeight:800,marginTop:8}}>PJ Cuidador</h1>
-      <p style={{opacity:.9,marginTop:6}}>Cuidar com segurança e tranquilidade</p>
-    </div>
-    <div className="pad" style={{flex:1}}>
-      <div className="tabs" style={{marginBottom:22}}>
-        <button className={!cadastro?"on":""} onClick={()=>setCadastro(false)}>Entrar</button>
-        <button className={cadastro?"on":""} onClick={()=>setCadastro(true)}>Cadastrar</button>
-      </div>
-      {cadastro && <div className="field"><label>Nome completo</label><input className="input" placeholder="Seu nome" defaultValue=""/></div>}
-      <div className="field"><label>E-mail</label><input className="input" type="email" placeholder="voce@email.com" defaultValue="cuidador@email.com"/></div>
-      <div className="field"><label>Senha</label><input className="input" type="password" placeholder="••••••••" defaultValue="123456"/></div>
-      {cadastro && <div className="field"><label>Confirmar senha</label><input className="input" type="password" placeholder="••••••••"/></div>}
-      {!cadastro && <p style={{textAlign:"right",fontSize:13,color:"var(--teal-d)",fontWeight:600,marginBottom:18,marginTop:-4}}>Esqueci minha senha</p>}
-      <button className="btn" onClick={onLogin}>{cadastro?"Criar conta":"Entrar"}</button>
-      <div style={{display:"flex",alignItems:"center",gap:12,margin:"22px 0"}}>
-        <div style={{flex:1,height:1,background:"var(--line)"}}/><span className="muted" style={{fontSize:13}}>ou</span><div style={{flex:1,height:1,background:"var(--line)"}}/>
-      </div>
-      <button className="btn line" onClick={onLogin} style={{marginBottom:10}}>🔵 Continuar com Google</button>
-      <button className="btn line" onClick={onLogin}>🍎 Continuar com Apple</button>
-      <p className="muted" style={{textAlign:"center",fontSize:12,marginTop:22,lineHeight:1.5}}>
-        Ao continuar você aceita os <b style={{color:"var(--teal-d)"}}>Termos de Uso</b> e a <b style={{color:"var(--teal-d)"}}>Política de Privacidade (LGPD)</b>.
+  <!-- Hero / Search -->
+  <section class="hero" id="inicio">
+    <div class="container hero__inner">
+      <h1 class="hero__title">Toda a legislação do seu município em um só lugar</h1>
+      <p class="hero__subtitle">
+        Consulte gratuitamente leis, decretos, portarias e o código tributário de
+        mais de <strong>5.500 municípios</strong> brasileiros.
       </p>
-    </div>
-  </div>;
-}
 
-/* ============ DASHBOARD ============ */
-function Dashboard({ctx}){
-  const {meds,vitais,pacientes,pacienteAtivo,setPacienteAtivo,push,setTab} = ctx;
-  const pac = pacientes.find(p=>p.id===pacienteAtivo);
-  const medsPac = meds.filter(m=>m.pacienteId===pacienteAtivo);
-
-  // próximos horários
-  const agora = "10:30";
-  const proximos = [];
-  medsPac.forEach(m=> m.horarios.forEach(h=>{
-    const tomado = m.tomado[h]===true;
-    proximos.push({med:m, hora:h, tomado});
-  }));
-  proximos.sort((a,b)=>a.hora.localeCompare(b.hora));
-  const pendentes = proximos.filter(p=>!p.tomado);
-  const alertasVitais = vitais.filter(v=>v.pacienteId===pacienteAtivo && v.alerta).slice(0,3);
-  const totalHoje = proximos.length;
-  const feitos = proximos.filter(p=>p.tomado).length;
-
-  return <div>
-    <div style={{background:"linear-gradient(160deg,#0e9488,#0b766c)",color:"#fff",padding:"20px 18px 26px",borderRadius:"0 0 26px 26px"}} className="no-print">
-      <div className="between">
-        <div>
-          <p style={{opacity:.85,fontSize:13}}>Olá, Cuidador 👋</p>
-          <h1 style={{fontSize:22,fontWeight:800,marginTop:2}}>Resumo de hoje</h1>
+      <form class="search" id="searchForm">
+        <div class="search__row">
+          <div class="search__field">
+            <label for="estado">Estado</label>
+            <select id="estado" required>
+              <option value="">Selecione o estado</option>
+            </select>
+          </div>
+          <div class="search__field">
+            <label for="municipio">Município</label>
+            <select id="municipio" required disabled>
+              <option value="">Selecione o município</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn--primary search__btn">
+            🔎 Pesquisar
+          </button>
         </div>
-        <div className="ava" style={{background:"rgba(255,255,255,.2)"}}>CD</div>
-      </div>
-      {/* seletor de paciente */}
-      <div className="scrollx" style={{marginTop:16}}>
-        {pacientes.map(p=>
-          <div key={p.id} onClick={()=>setPacienteAtivo(p.id)}
-            style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",borderRadius:30,cursor:"pointer",
-              background:p.id===pacienteAtivo?"#fff":"rgba(255,255,255,.18)",color:p.id===pacienteAtivo?"#0b766c":"#fff",fontWeight:600,fontSize:14,whiteSpace:"nowrap"}}>
-            <span>{p.foto}</span>{p.nome.split(" ")[0]}
-          </div>)}
-      </div>
-    </div>
 
-    <div className="pad">
-      {/* progresso do dia */}
-      <div className="card">
-        <div className="between">
-          <div><b style={{fontSize:15}}>Progresso do dia</b><p className="muted" style={{fontSize:13}}>{feitos} de {totalHoje} doses administradas</p></div>
-          <div style={{fontSize:22,fontWeight:800,color:"var(--teal)"}}>{totalHoje?Math.round(feitos/totalHoje*100):0}%</div>
+        <div class="search__keyword">
+          <input type="text" id="keyword" placeholder="Ou busque por palavra-chave: ex. IPTU, zoneamento, alvará..." />
+          <button type="button" class="btn btn--ghost" id="keywordBtn">Buscar termo</button>
         </div>
-        <div style={{height:9,background:"#eef2f1",borderRadius:6,marginTop:12,overflow:"hidden"}}>
-          <div style={{height:"100%",width:(totalHoje?feitos/totalHoje*100:0)+"%",background:"var(--green)",borderRadius:6,transition:".4s"}}/>
-        </div>
-      </div>
+      </form>
 
-      {/* alertas */}
-      {alertasVitais.length>0 && <>
-        <div className="sec-title">⚠️ Alertas de sinais vitais</div>
-        {alertasVitais.map(v=>
-          <div key={v.id} className="alertbar" style={{marginBottom:8}}>
-            <span style={{fontSize:20}}>🔴</span>
-            <div style={{flex:1}}>
-              <b>{v.tipo}: {v.valor} {v.unidade}</b>
-              <div style={{fontSize:12,opacity:.85}}>Valor fora do padrão · {v.data.split(" ")[1]}</div>
-            </div>
-          </div>)}
-      </>}
-
-      {/* próximos medicamentos */}
-      <div className="between" style={{marginTop:22,marginBottom:10,padding:"0 4px"}}>
-        <div className="sec-title" style={{margin:0}}>💊 Próximos medicamentos</div>
-        <span style={{fontSize:13,fontWeight:600,color:"var(--teal-d)",cursor:"pointer"}} onClick={()=>setTab("meds")}>Ver tudo</span>
-      </div>
-      {pendentes.length===0 && <div className="card"><p className="muted" style={{textAlign:"center"}}>🎉 Todas as doses de hoje foram administradas!</p></div>}
-      {pendentes.slice(0,4).map((p,i)=>
-        <div key={i} className="card" style={{marginBottom:8,cursor:"pointer"}} onClick={()=>push("detalheMed",{medId:p.med.id})}>
-          <div className="row">
-            <div style={{textAlign:"center",minWidth:50}}>
-              <div style={{fontSize:16,fontWeight:800,color:"var(--teal-d)"}}>{p.hora}</div>
-              <div className="pill" style={{padding:"2px 8px",fontSize:10,marginTop:2}}>hoje</div>
-            </div>
-            <div style={{width:1,height:36,background:"var(--line)"}}/>
-            <div style={{flex:1}}>
-              <b>{p.med.nome} {p.med.dosagem}</b>
-              <div className="muted" style={{fontSize:13}}>{p.med.via} · {p.med.forma}</div>
-            </div>
-            <span style={{fontSize:20,color:"var(--muted)"}}>›</span>
-          </div>
-        </div>)}
-
-      {/* atalhos */}
-      <div className="sec-title">Acesso rápido</div>
-      <div className="grid2">
-        <Atalho icon="📷" label="Escanear receita" onClick={()=>push("ocr")} />
-        <Atalho icon="🫀" label="Registrar sinais" onClick={()=>push("registrarVital")} />
-        <Atalho icon="📊" label="Histórico vitais" onClick={()=>push("historicoVital")} />
-        <Atalho icon="🖨️" label="Imprimir cronograma" onClick={()=>push("cronograma")} />
-      </div>
-      <div style={{height:20}}/>
+      <p class="hero__hint" id="searchHint"></p>
     </div>
-  </div>;
-}
-function Atalho({icon,label,onClick}){
-  return <div className="card" onClick={onClick} style={{cursor:"pointer",textAlign:"center",padding:"18px 10px"}}>
-    <div style={{fontSize:30}}>{icon}</div>
-    <div style={{fontWeight:600,fontSize:13,marginTop:8}}>{label}</div>
-  </div>;
-}
+  </section>
 
-/* ============ PACIENTES ============ */
-function Pacientes({ctx}){
-  const {pacientes,setPacientes,push,pacienteAtivo,setPacienteAtivo,meds} = ctx;
-  return <div>
-    <Top title="Meus Pacientes" action={{label:"+ Novo", onClick:()=>push("novoPaciente",{})}} />
-    <div className="pad">
-      {pacientes.map(p=>{
-        const nmed = meds.filter(m=>m.pacienteId===p.id).length;
-        return <div key={p.id} className="card" style={{marginBottom:12}}>
-          <div className="row">
-            <div className="ava lg">{p.foto}</div>
-            <div style={{flex:1}}>
-              <b style={{fontSize:16}}>{p.nome}</b>
-              <div className="muted" style={{fontSize:13}}>{p.idade} anos · {p.sexo}</div>
-              <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:8}}>
-                {p.condicoes.map((c,i)=><span key={i} className="pill gray">{c}</span>)}
-              </div>
-            </div>
-          </div>
-          <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--line)"}}>
-            <div className="muted" style={{fontSize:13}}><b>Alergias:</b> {p.alergias.join(", ")}</div>
-            <div className="muted" style={{fontSize:13,marginTop:4}}>💊 {nmed} medicamento(s) cadastrado(s)</div>
-          </div>
-          <div className="row" style={{marginTop:12,gap:8}}>
-            <button className={"btn sm "+(p.id===pacienteAtivo?"":"line")} style={{flex:1}}
-              onClick={()=>setPacienteAtivo(p.id)}>{p.id===pacienteAtivo?"✓ Selecionado":"Selecionar"}</button>
-            <button className="btn sm line" onClick={()=>push("novoPaciente",{paciente:p})}>Editar</button>
-          </div>
-        </div>;
-      })}
-      <button className="btn ghost" onClick={()=>push("novoPaciente",{})}>+ Adicionar paciente</button>
-      <div style={{height:20}}/>
+  <!-- Stats -->
+  <section class="stats">
+    <div class="container stats__inner">
+      <div class="stat"><span class="stat__num">5.570</span><span class="stat__label">Municípios cobertos</span></div>
+      <div class="stat"><span class="stat__num">12 mi+</span><span class="stat__label">Documentos legais</span></div>
+      <div class="stat"><span class="stat__num">26 + DF</span><span class="stat__label">Estados atendidos</span></div>
+      <div class="stat"><span class="stat__num">100%</span><span class="stat__label">Consulta gratuita</span></div>
     </div>
-  </div>;
-}
+  </section>
 
-/* ============ FORM PACIENTE ============ */
-function FormPaciente({ctx, paciente}){
-  const {pacientes,setPacientes,pop,showToast} = ctx;
-  const edit = !!paciente;
-  const [f,setF] = useState(paciente || {nome:"",idade:"",sexo:"Feminino",foto:"🧑",condicoes:"",alergias:""});
-  const setV = (k,v)=> setF({...f,[k]:v});
-  const save = ()=>{
-    if(!f.nome){ showToast("Informe o nome do paciente"); return; }
-    const obj = {
-      id: edit?paciente.id:Date.now(),
-      nome:f.nome, idade:parseInt(f.idade)||0, sexo:f.sexo, foto:f.foto||"🧑",
-      condicoes: Array.isArray(f.condicoes)?f.condicoes:(f.condicoes||"").split(",").map(s=>s.trim()).filter(Boolean),
-      alergias: Array.isArray(f.alergias)?f.alergias:(f.alergias||"").split(",").map(s=>s.trim()).filter(Boolean),
-    };
-    if(!obj.alergias.length) obj.alergias=["Nenhuma conhecida"];
-    setPacientes(edit? pacientes.map(p=>p.id===obj.id?obj:p) : [...pacientes,obj]);
-    showToast(edit?"Paciente atualizado":"Paciente cadastrado");
-    pop();
-  };
-  const condStr = Array.isArray(f.condicoes)?f.condicoes.join(", "):f.condicoes;
-  const alergStr = Array.isArray(f.alergias)?f.alergias.join(", "):f.alergias;
-  const fotos=["👵","👴","🧑","👨","👩","🧓"];
-  return <div className="scroll">
-    <Top title={edit?"Editar Paciente":"Novo Paciente"} onBack={pop} />
-    <div className="pad">
-      <div style={{textAlign:"center",marginBottom:18}}>
-        <div className="ava lg" style={{margin:"0 auto"}}>{f.foto}</div>
-        <div className="scrollx" style={{justifyContent:"center",marginTop:12}}>
-          {fotos.map(e=><div key={e} onClick={()=>setV("foto",e)} style={{fontSize:26,padding:"4px 8px",borderRadius:10,cursor:"pointer",background:f.foto===e?"var(--teal-bg)":"transparent"}}>{e}</div>)}
-        </div>
-        <p className="muted" style={{fontSize:12,marginTop:4}}>📷 Toque para escolher uma foto</p>
+  <!-- Features -->
+  <section class="features" id="recursos">
+    <div class="container">
+      <header class="section__head">
+        <h2>Por que usar a LegisCidade?</h2>
+        <p>Uma base legislativa organizada, atualizada e fácil de pesquisar.</p>
+      </header>
+
+      <div class="features__grid">
+        <article class="card">
+          <div class="card__icon">⚖️</div>
+          <h3>Legislação completa</h3>
+          <p>Leis orgânicas, ordinárias, complementares, decretos e portarias compilados e consolidados.</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">🔄</div>
+          <h3>Sempre atualizada</h3>
+          <p>Acompanhe alterações, revogações e a versão consolidada de cada norma em tempo real.</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">🔍</div>
+          <h3>Busca inteligente</h3>
+          <p>Encontre dispositivos por palavra-chave, número, ano ou assunto em segundos.</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">📑</div>
+          <h3>Código tributário</h3>
+          <p>Consulte o CTM, alíquotas e obrigações fiscais diretamente da fonte oficial.</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">📱</div>
+          <h3>Acesso em qualquer lugar</h3>
+          <p>Plataforma responsiva: consulte do computador, tablet ou celular.</p>
+        </article>
+        <article class="card">
+          <div class="card__icon">🔔</div>
+          <h3>Alertas de publicação</h3>
+          <p>Receba avisos quando novas normas do seu município forem publicadas.</p>
+        </article>
       </div>
-      <div className="field"><label>Nome completo *</label><input className="input" value={f.nome} onChange={e=>setV("nome",e.target.value)} placeholder="Nome do paciente"/></div>
-      <div className="grid2">
-        <div className="field"><label>Idade</label><input className="input" type="number" value={f.idade} onChange={e=>setV("idade",e.target.value)} placeholder="Anos"/></div>
-        <div className="field"><label>Sexo</label>
-          <select value={f.sexo} onChange={e=>setV("sexo",e.target.value)}><option>Feminino</option><option>Masculino</option><option>Outro</option></select>
-        </div>
-      </div>
-      <div className="field"><label>Condições de saúde</label><textarea rows="2" value={condStr} onChange={e=>setV("condicoes",e.target.value)} placeholder="Ex: Hipertensão, Diabetes (separe por vírgula)"/></div>
-      <div className="field"><label>Alergias</label><textarea rows="2" value={alergStr} onChange={e=>setV("alergias",e.target.value)} placeholder="Ex: Dipirona, Penicilina"/></div>
-      <button className="btn" onClick={save}>{edit?"Salvar alterações":"Cadastrar paciente"}</button>
-      <div style={{height:20}}/>
     </div>
-  </div>;
-}
+  </section>
 
-/* ============ OCR ============ */
-function OCR({ctx}){
-  const {meds,setMeds,pacienteAtivo,pacientes,pop,showToast,push} = ctx;
-  const [fase,setFase] = useState("camera"); // camera -> scanning -> result
-  const pac = pacientes.find(p=>p.id===pacienteAtivo);
-  const detectados = [
-    {nome:"Atorvastatina", dosagem:"20mg", via:"Oral", forma:"Comprimido", horarios:["22:00"], obs:"Tomar à noite. Colesterol."},
-    {nome:"AAS", dosagem:"100mg", via:"Oral", forma:"Comprimido", horarios:["12:00"], obs:"Tomar após o almoço."},
-    {nome:"Omeprazol", dosagem:"20mg", via:"Oral", forma:"Cápsula", horarios:["07:00"], obs:"Em jejum, antes do café."},
-  ];
-  const [sel,setSel] = useState([0,1,2]);
-
-  const escanear = ()=>{ setFase("scanning"); setTimeout(()=>setFase("result"), 2600); };
-  const importar = ()=>{
-    const novos = sel.map((idx,i)=>({...detectados[idx], id:Date.now()+i, pacienteId:pacienteAtivo,
-      passos:["Lave as mãos.","Confira nome e dosagem.","Ofereça com água.","Registre a administração."], tomado:{}}));
-    setMeds([...meds, ...novos]);
-    showToast(novos.length+" medicamento(s) importado(s)");
-    pop();
-  };
-
-  return <div className="scroll" style={{background:fase==="result"?"var(--bg)":"#0f2620"}}>
-    <Top title="Escanear Receita" onBack={pop} />
-    {fase!=="result" && <div style={{padding:18,color:"#fff",minHeight:600,display:"flex",flexDirection:"column"}}>
-      <p style={{opacity:.85,textAlign:"center",marginBottom:16}}>Posicione a receita médica de <b>{pac.nome.split(" ")[0]}</b> dentro da moldura</p>
-      <div style={{flex:1,border:"3px dashed rgba(255,255,255,.4)",borderRadius:20,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",position:"relative",minHeight:380,background:"rgba(255,255,255,.04)"}}>
-        {fase==="camera" && <><div style={{fontSize:80}}>📄</div><p style={{opacity:.7,marginTop:14}}>Aponte para a prescrição</p></>}
-        {fase==="scanning" && <div className="scanning" style={{textAlign:"center"}}>
-          <div style={{fontSize:80}}>🔍</div>
-          <p style={{marginTop:16,fontWeight:600}}>Lendo com IA...</p>
-          <p style={{opacity:.7,fontSize:13,marginTop:6}}>Identificando medicamentos, doses e horários</p>
-        </div>}
-        <div style={{position:"absolute",top:14,left:14,width:30,height:30,borderTop:"3px solid var(--teal-l)",borderLeft:"3px solid var(--teal-l)"}}/>
-        <div style={{position:"absolute",top:14,right:14,width:30,height:30,borderTop:"3px solid var(--teal-l)",borderRight:"3px solid var(--teal-l)"}}/>
-        <div style={{position:"absolute",bottom:14,left:14,width:30,height:30,borderBottom:"3px solid var(--teal-l)",borderLeft:"3px solid var(--teal-l)"}}/>
-        <div style={{position:"absolute",bottom:14,right:14,width:30,height:30,borderBottom:"3px solid var(--teal-l)",borderRight:"3px solid var(--teal-l)"}}/>
-      </div>
-      {fase==="camera" && <button className="btn" style={{marginTop:18,background:"#fff",color:"#0b766c"}} onClick={escanear}>📷 Capturar receita</button>}
-      {fase==="camera" && <p style={{textAlign:"center",opacity:.6,fontSize:12,marginTop:12}}>🤖 A IA lê a receita e cria o cronograma sem digitação</p>}
-    </div>}
-
-    {fase==="result" && <div className="pad">
-      <div className="card" style={{background:"var(--green-bg)",border:"1px solid #bbf7d0"}}>
-        <div className="row"><span style={{fontSize:24}}>✅</span><div><b>Leitura concluída!</b><p className="muted" style={{fontSize:13}}>{detectados.length} medicamentos identificados. Confira e selecione.</p></div></div>
-      </div>
-      <div className="sec-title">Medicamentos detectados</div>
-      {detectados.map((d,i)=>{
-        const on = sel.includes(i);
-        return <div key={i} className="card" style={{marginBottom:10,borderColor:on?"var(--teal)":"var(--line)"}} onClick={()=> setSel(on? sel.filter(x=>x!==i):[...sel,i])}>
-          <div className="row">
-            <div className={"check "+(on?"on":"")}>{on?"✓":""}</div>
-            <div style={{flex:1}}>
-              <b>{d.nome} {d.dosagem}</b>
-              <div className="muted" style={{fontSize:13}}>{d.via} · {d.horarios.join(", ")}</div>
-              <div className="muted" style={{fontSize:12,marginTop:2}}>{d.obs}</div>
-            </div>
-          </div>
-        </div>;
-      })}
-      <button className="btn" onClick={importar} disabled={!sel.length} style={{opacity:sel.length?1:.5}}>Importar {sel.length} medicamento(s)</button>
-      <button className="btn line" style={{marginTop:10}} onClick={()=>setFase("camera")}>↺ Escanear novamente</button>
-      <div style={{height:20}}/>
-    </div>}
-  </div>;
-}
-
-/* ============ MEDICAÇÕES ============ */
-function Medicacoes({ctx}){
-  const {meds,setMeds,pacientes,pacienteAtivo,setPacienteAtivo,push,showToast} = ctx;
-  const [periodo,setPeriodo] = useState("Hoje");
-  const lista = meds.filter(m=>m.pacienteId===pacienteAtivo);
-
-  const toggle = (m,h)=>{
-    setMeds(meds.map(x=> x.id===m.id ? {...x, tomado:{...x.tomado,[h]: !x.tomado[h]}} : x));
-  };
-  const excluir = (m)=>{ setMeds(meds.filter(x=>x.id!==m.id)); showToast("Medicamento excluído"); };
-
-  // monta linhas por horário
-  const linhas=[];
-  lista.forEach(m=> m.horarios.forEach(h=> linhas.push({m,h})));
-  linhas.sort((a,b)=>a.h.localeCompare(b.h));
-
-  return <div>
-    <Top title="Medicações" action={{label:"📷 OCR", onClick:()=>push("ocr")}} />
-    <div className="pad">
-      {/* filtro paciente */}
-      <div className="scrollx" style={{marginBottom:12}}>
-        {pacientes.map(p=><div key={p.id} className={"chip "+(p.id===pacienteAtivo?"on":"")} onClick={()=>setPacienteAtivo(p.id)}>{p.foto} {p.nome.split(" ")[0]}</div>)}
-      </div>
-      <div className="tabs">
-        {["Hoje","Semana","Todos"].map(t=><button key={t} className={periodo===t?"on":""} onClick={()=>setPeriodo(t)}>{t}</button>)}
-      </div>
-
-      {linhas.length===0 && <div className="card"><p className="muted" style={{textAlign:"center"}}>Nenhum medicamento. Toque em 📷 OCR ou + para adicionar.</p></div>}
-
-      {linhas.map(({m,h},i)=>{
-        const tomado = m.tomado[h]===true;
-        return <div key={m.id+h} className="card" style={{marginBottom:10}}>
-          <div className="row">
-            <div className={"check "+(tomado?"on":"")} onClick={()=>toggle(m,h)}>{tomado?"✓":""}</div>
-            <div style={{flex:1,cursor:"pointer"}} onClick={()=>push("detalheMed",{medId:m.id})}>
-              <div className="between">
-                <b style={{textDecoration:tomado?"line-through":"none",opacity:tomado?.5:1}}>{m.nome} {m.dosagem}</b>
-                <span className="pill" style={{padding:"3px 9px"}}>🕐 {h}</span>
-              </div>
-              <div className="muted" style={{fontSize:13,marginTop:3}}>{m.via} · {m.forma}</div>
-              {tomado && <div className="pill green" style={{marginTop:6,padding:"2px 8px",fontSize:11}}>✓ Administrado</div>}
-            </div>
-          </div>
-        </div>;
-      })}
-
-      <button className="btn ghost" style={{marginTop:6}} onClick={()=>push("novaMed",{})}>+ Adicionar manualmente</button>
-      <div style={{height:80}}/>
+  <!-- Featured cities -->
+  <section class="cities" id="cidades">
+    <div class="container">
+      <header class="section__head">
+        <h2>Municípios em destaque</h2>
+        <p>Acesse a legislação das cidades mais consultadas.</p>
+      </header>
+      <div class="cities__grid" id="citiesGrid"></div>
     </div>
-    <button className="fab no-print" onClick={()=>push("novaMed",{})}>+</button>
-  </div>;
-}
+  </section>
 
-/* ============ FORM MED ============ */
-function FormMed({ctx, med}){
-  const {meds,setMeds,pacienteAtivo,pop,showToast} = ctx;
-  const edit=!!med;
-  const [f,setF]=useState(med || {nome:"",dosagem:"",via:"Oral",forma:"Comprimido",horarios:["08:00"],obs:""});
-  const setV=(k,v)=>setF({...f,[k]:v});
-  const setHora=(i,v)=>{const h=[...f.horarios];h[i]=v;setV("horarios",h);};
-  const save=()=>{
-    if(!f.nome){showToast("Informe o nome");return;}
-    const obj={...f, id:edit?med.id:Date.now(), pacienteId:edit?med.pacienteId:pacienteAtivo,
-      passos: f.passos||["Lave as mãos.","Confira nome e dosagem.","Ofereça com água.","Registre a administração."], tomado:f.tomado||{}};
-    setMeds(edit? meds.map(m=>m.id===obj.id?obj:m):[...meds,obj]);
-    showToast(edit?"Atualizado":"Medicamento adicionado"); pop();
-  };
-  return <div className="scroll">
-    <Top title={edit?"Editar Medicamento":"Novo Medicamento"} onBack={pop} />
-    <div className="pad">
-      <div className="field"><label>Nome do medicamento *</label><input className="input" value={f.nome} onChange={e=>setV("nome",e.target.value)} placeholder="Ex: Losartana"/></div>
-      <div className="grid2">
-        <div className="field"><label>Dosagem</label><input className="input" value={f.dosagem} onChange={e=>setV("dosagem",e.target.value)} placeholder="Ex: 50mg"/></div>
-        <div className="field"><label>Forma</label><select value={f.forma} onChange={e=>setV("forma",e.target.value)}>{["Comprimido","Cápsula","Injetável","Spray","Gotas","Xarope","Pomada"].map(o=><option key={o}>{o}</option>)}</select></div>
+  <!-- Plans -->
+  <section class="plans" id="planos">
+    <div class="container">
+      <header class="section__head">
+        <h2>Planos para gestores públicos</h2>
+        <p>A consulta cidadã é gratuita. Para prefeituras e câmaras, oferecemos ferramentas avançadas.</p>
+      </header>
+      <div class="plans__grid">
+        <article class="plan">
+          <h3 class="plan__name">Cidadão</h3>
+          <p class="plan__price">Grátis</p>
+          <ul class="plan__list">
+            <li>Consulta ilimitada</li>
+            <li>Busca por palavra-chave</li>
+            <li>Versão consolidada</li>
+          </ul>
+          <a href="#" class="btn btn--outline plan__cta">Começar</a>
+        </article>
+        <article class="plan plan--featured">
+          <span class="plan__badge">Mais popular</span>
+          <h3 class="plan__name">Gestão</h3>
+          <p class="plan__price">Sob consulta</p>
+          <ul class="plan__list">
+            <li>Tudo do plano Cidadão</li>
+            <li>Compilação automática</li>
+            <li>Diário oficial integrado</li>
+            <li>Suporte prioritário</li>
+          </ul>
+          <a href="#contato" class="btn btn--primary plan__cta">Falar com vendas</a>
+        </article>
+        <article class="plan">
+          <h3 class="plan__name">Enterprise</h3>
+          <p class="plan__price">Personalizado</p>
+          <ul class="plan__list">
+            <li>API de integração</li>
+            <li>Multi-órgãos</li>
+            <li>Treinamento dedicado</li>
+          </ul>
+          <a href="#contato" class="btn btn--outline plan__cta">Solicitar proposta</a>
+        </article>
       </div>
-      <div className="field"><label>Via de administração</label><select value={f.via} onChange={e=>setV("via",e.target.value)}>{["Oral","Subcutânea","Intramuscular","Inalatória","Tópica","Ocular"].map(o=><option key={o}>{o}</option>)}</select></div>
-      <div className="field"><label>Horários</label>
-        {f.horarios.map((h,i)=><div key={i} className="row" style={{marginBottom:8}}>
-          <input className="input" type="time" value={h} onChange={e=>setHora(i,e.target.value)}/>
-          {f.horarios.length>1 && <button className="btn sm danger" onClick={()=>setV("horarios",f.horarios.filter((_,k)=>k!==i))}>✕</button>}
-        </div>)}
-        <button className="btn sm ghost" onClick={()=>setV("horarios",[...f.horarios,"12:00"])}>+ Horário</button>
-      </div>
-      <div className="field"><label>Observações</label><textarea rows="2" value={f.obs} onChange={e=>setV("obs",e.target.value)} placeholder="Ex: Tomar com água, em jejum..."/></div>
-      <button className="btn" onClick={save}>{edit?"Salvar":"Adicionar"}</button>
-      <div style={{height:20}}/>
     </div>
-  </div>;
-}
+  </section>
 
-/* ============ DETALHE MED ============ */
-function DetalheMed({ctx, medId}){
-  const {meds,setMeds,pacientes,pop,push,showToast} = ctx;
-  const m = meds.find(x=>x.id===medId);
-  if(!m) return <div><Top title="Medicamento" onBack={pop}/><div className="pad">Não encontrado.</div></div>;
-  const pac = pacientes.find(p=>p.id===m.pacienteId);
-  const excluir=()=>{ setMeds(meds.filter(x=>x.id!==m.id)); showToast("Excluído"); pop(); };
-  const marcar=(h)=>{ setMeds(meds.map(x=>x.id===m.id?{...x,tomado:{...x.tomado,[h]:!x.tomado[h]}}:x)); };
-  return <div className="scroll">
-    <Top title="Detalhes" onBack={pop} action={{label:"Editar", onClick:()=>push("novaMed",{med:m})}} />
-    <div className="pad">
-      <div className="card" style={{textAlign:"center"}}>
-        <div style={{fontSize:46}}>💊</div>
-        <h1 style={{fontSize:22,fontWeight:800,marginTop:6}}>{m.nome}</h1>
-        <p className="muted">{m.dosagem} · {m.forma}</p>
-        <p className="muted" style={{fontSize:13,marginTop:4}}>Paciente: {pac?.nome}</p>
+  <!-- CTA / Contact -->
+  <section class="cta" id="contato">
+    <div class="container cta__inner">
+      <div class="cta__text">
+        <h2>Sua prefeitura ainda não está na LegisCidade?</h2>
+        <p>Fale com nossa equipe e disponibilize a legislação do seu município de forma transparente e acessível.</p>
       </div>
-
-      <div className="card" style={{marginTop:12}}>
-        <div className="grid2" style={{gap:14}}>
-          <Info label="Via" valor={m.via}/>
-          <Info label="Forma" valor={m.forma}/>
-          <Info label="Dosagem" valor={m.dosagem}/>
-          <Info label="Doses/dia" valor={m.horarios.length}/>
-        </div>
-        {m.obs && <div style={{marginTop:14,paddingTop:14,borderTop:"1px solid var(--line)"}}>
-          <div className="muted" style={{fontSize:12,fontWeight:700,textTransform:"uppercase"}}>Observações</div>
-          <p style={{fontSize:14,marginTop:4}}>{m.obs}</p>
-        </div>}
-      </div>
-
-      <div className="sec-title">🕐 Horários de hoje</div>
-      <div className="card">
-        {m.horarios.map((h,i)=>{
-          const t=m.tomado[h]===true;
-          return <div key={h} className="listitem">
-            <span className="pill" style={{minWidth:62,justifyContent:"center"}}>{h}</span>
-            <div style={{flex:1}}>{t?<span className="pill green">✓ Administrado</span>:<span className="pill amber">Pendente</span>}</div>
-            <button className={"btn sm "+(t?"line":"")} onClick={()=>marcar(h)}>{t?"Desmarcar":"Marcar dado"}</button>
-          </div>;
-        })}
-      </div>
-
-      <div className="sec-title">📋 Passo a passo da administração</div>
-      <div className="card">
-        {m.passos.map((p,i)=>
-          <div key={i} className="row" style={{alignItems:"flex-start",padding:"10px 0",borderBottom:i<m.passos.length-1?"1px solid var(--line)":"none"}}>
-            <div className="stepnum">{i+1}</div>
-            <p style={{flex:1,fontSize:14,lineHeight:1.45,paddingTop:2}}>{p}</p>
-          </div>)}
-        <div className="alertbar" style={{marginTop:12,background:"#fef3c7",borderColor:"#fde68a",color:"var(--amber)"}}>
-          <span style={{fontSize:18}}>⚠️</span>
-          <span style={{fontSize:13}}>Em caso de reação adversa, suspenda e contate o médico imediatamente.</span>
-        </div>
-      </div>
-
-      <button className="btn danger" style={{marginTop:16}} onClick={excluir}>🗑️ Excluir medicamento</button>
-      <div style={{height:20}}/>
+      <form class="cta__form" id="contactForm">
+        <input type="text" placeholder="Nome" required />
+        <input type="email" placeholder="E-mail" required />
+        <input type="text" placeholder="Município / Órgão" required />
+        <button type="submit" class="btn btn--primary">Enviar contato</button>
+        <span class="cta__feedback" id="contactFeedback"></span>
+      </form>
     </div>
-  </div>;
-}
-function Info({label,valor}){
-  return <div><div className="muted" style={{fontSize:11,fontWeight:700,textTransform:"uppercase"}}>{label}</div><div style={{fontWeight:700,fontSize:15,marginTop:2}}>{valor}</div></div>;
-}
+  </section>
 
-/* ============ VITAIS HOME ============ */
-function VitaisHome({ctx}){
-  const {vitais,pacientes,pacienteAtivo,setPacienteAtivo,push} = ctx;
-  const lista = vitais.filter(v=>v.pacienteId===pacienteAtivo);
-  const ultimosPorTipo = {};
-  lista.forEach(v=>{ if(!ultimosPorTipo[v.tipo]) ultimosPorTipo[v.tipo]=v; });
-
-  return <div>
-    <Top title="Sinais Vitais" action={{label:"📊 Histórico", onClick:()=>push("historicoVital")}} />
-    <div className="pad">
-      <div className="scrollx" style={{marginBottom:14}}>
-        {pacientes.map(p=><div key={p.id} className={"chip "+(p.id===pacienteAtivo?"on":"")} onClick={()=>setPacienteAtivo(p.id)}>{p.foto} {p.nome.split(" ")[0]}</div>)}
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer__inner">
+      <div class="footer__col footer__brand">
+        <a href="#" class="brand brand--footer">
+          <img src="assets/logo.svg" alt="LegisCidade" class="brand__logo" />
+          <span class="brand__text"><strong>Legis</strong>Cidade</span>
+        </a>
+        <p>Democratizando o acesso à legislação municipal brasileira.</p>
       </div>
-
-      <div className="sec-title">Últimas medições</div>
-      {VITAL_TIPOS.map(t=>{
-        const v=ultimosPorTipo[t.nome];
-        return <div key={t.nome} className="card" style={{marginBottom:10,borderColor:v&&v.alerta?"#fecaca":"var(--line)"}}>
-          <div className="row">
-            <div style={{fontSize:28}}>{t.icon}</div>
-            <div style={{flex:1}}>
-              <b>{t.nome}</b>
-              <div className="muted" style={{fontSize:12}}>{v? v.data : "Nunca registrado"}</div>
-            </div>
-            <div style={{textAlign:"right"}}>
-              {v? <><div style={{fontSize:20,fontWeight:800,color:v.alerta?"var(--red)":"var(--ink)"}}>{v.valor}</div>
-                   <div className="muted" style={{fontSize:11}}>{t.unidade}</div></>
-                 : <span className="muted">—</span>}
-            </div>
-            {v&&v.alerta && <span style={{fontSize:18}}>🔴</span>}
-          </div>
-        </div>;
-      })}
-
-      <button className="btn" style={{marginTop:10}} onClick={()=>push("registrarVital")}>＋ Registrar sinais vitais</button>
-      <button className="btn line" style={{marginTop:10}} onClick={()=>push("historicoVital")}>📊 Ver histórico e gráficos</button>
-      <div style={{height:80}}/>
+      <div class="footer__col">
+        <h4>Navegação</h4>
+        <a href="#inicio">Início</a>
+        <a href="#recursos">Recursos</a>
+        <a href="#cidades">Cidades</a>
+        <a href="#planos">Planos</a>
+      </div>
+      <div class="footer__col">
+        <h4>Institucional</h4>
+        <a href="#">Sobre nós</a>
+        <a href="#">Termos de uso</a>
+        <a href="#">Política de privacidade</a>
+        <a href="#">LGPD</a>
+      </div>
+      <div class="footer__col">
+        <h4>Contato</h4>
+        <a href="#">0800 000 0000</a>
+        <a href="#">contato@legiscidade.com.br</a>
+        <a href="#">Atendimento: seg a sex, 8h–18h</a>
+      </div>
     </div>
-    <button className="fab no-print" onClick={()=>push("registrarVital")}>+</button>
-  </div>;
-}
-
-/* ============ REGISTRAR VITAL ============ */
-function RegistrarVital({ctx}){
-  const {vitais,setVitais,pacienteAtivo,pacientes,pop,showToast} = ctx;
-  const pac=pacientes.find(p=>p.id===pacienteAtivo);
-  const [vals,setVals]=useState({});
-  const setVal=(t,v)=>setVals({...vals,[t]:v});
-
-  const previa = Object.entries(vals).filter(([t,v])=>v).map(([t,v])=>({tipo:t,valor:v,...avaliarVital(t,v)}));
-  const temAlerta = previa.some(p=>p.alerta);
-
-  const salvar=()=>{
-    const entradas = Object.entries(vals).filter(([t,v])=>v);
-    if(!entradas.length){ showToast("Preencha ao menos um valor"); return; }
-    const tipoUni = Object.fromEntries(VITAL_TIPOS.map(t=>[t.nome,t.unidade]));
-    const novos = entradas.map(([t,v],i)=>({id:Date.now()+i, pacienteId:pacienteAtivo, tipo:t, valor:v,
-      unidade:tipoUni[t], data:"2026-06-12 10:30", alerta:avaliarVital(t,v).alerta}));
-    setVitais([...novos,...vitais]);
-    showToast(temAlerta?"⚠️ Registrado com alerta!":"Sinais registrados");
-    pop();
-  };
-
-  return <div className="scroll">
-    <Top title="Registrar Sinais Vitais" onBack={pop} />
-    <div className="pad">
-      <div className="card" style={{marginBottom:14}}>
-        <div className="row"><div className="ava">{pac.foto}</div><div><b>{pac.nome}</b><div className="muted" style={{fontSize:13}}>📅 12/06/2026 · 10:30</div></div></div>
+    <div class="footer__bottom">
+      <div class="container">
+        <span>© 2026 LegisCidade. Todos os direitos reservados.</span>
+        <span>Feito no Brasil 🇧🇷</span>
       </div>
-
-      {VITAL_TIPOS.map(t=>{
-        const v=vals[t.nome]||"";
-        const av = v? avaliarVital(t.nome,v):null;
-        return <div key={t.nome} className="card" style={{marginBottom:10,borderColor:av&&av.alerta?"#fecaca":"var(--line)"}}>
-          <div className="between" style={{marginBottom:8}}>
-            <b style={{fontSize:14}}>{t.icon} {t.nome}</b><span className="muted" style={{fontSize:13}}>{t.unidade}</span>
-          </div>
-          <input className="input" value={v} onChange={e=>setVal(t.nome,e.target.value)} placeholder={t.ph}/>
-          {av && <div className={"pill "+(av.alerta?"red":"green")} style={{marginTop:8}}>{av.alerta?"🔴":"✓"} {av.msg}</div>}
-        </div>;
-      })}
-
-      {temAlerta && <div className="alertbar" style={{marginTop:6}}>
-        <span style={{fontSize:20}}>⚠️</span><span>Há valores fora do padrão. Considere contatar o médico responsável.</span>
-      </div>}
-
-      <button className="btn" style={{marginTop:14}} onClick={salvar}>Salvar registro</button>
-      <div style={{height:20}}/>
     </div>
-  </div>;
-}
+  </footer>
 
-/* ============ HISTÓRICO VITAL ============ */
-function HistoricoVital({ctx}){
-  const {vitais,pacienteAtivo,pop} = ctx;
-  const [tipo,setTipo]=useState("Pressão arterial");
-  const lista = vitais.filter(v=>v.pacienteId===pacienteAtivo && v.tipo===tipo)
-    .slice().sort((a,b)=>a.data.localeCompare(b.data));
-
-  // gráfico
-  const pts = lista.map(v=>{
-    let n;
-    if(tipo==="Pressão arterial") n=parseInt(v.valor.split("/")[0]);
-    else n=parseFloat(v.valor.replace(",","."));
-    return {n, v};
-  });
-  const W=340,H=140,P=10;
-  const max=Math.max(...pts.map(p=>p.n),1), min=Math.min(...pts.map(p=>p.n),0);
-  const rng=(max-min)||1;
-  const coords=pts.map((p,i)=>{
-    const x=P+(pts.length>1? i/(pts.length-1):0.5)*(W-2*P);
-    const y=H-P-((p.n-min)/rng)*(H-2*P);
-    return {x,y,...p};
-  });
-  const path=coords.map((c,i)=>(i?"L":"M")+c.x.toFixed(1)+" "+c.y.toFixed(1)).join(" ");
-
-  return <div className="scroll">
-    <Top title="Histórico de Sinais" onBack={pop} />
-    <div className="pad">
-      <div className="scrollx" style={{marginBottom:14}}>
-        {VITAL_TIPOS.map(t=><div key={t.nome} className={"chip "+(tipo===t.nome?"on":"")} onClick={()=>setTipo(t.nome)}>{t.icon} {t.nome}</div>)}
-      </div>
-
-      <div className="card">
-        <b style={{fontSize:15}}>Evolução · {tipo}</b>
-        {pts.length===0 ? <p className="muted" style={{marginTop:10}}>Sem registros para este sinal.</p> :
-        <svg viewBox={`0 0 ${W} ${H}`} style={{width:"100%",marginTop:12}}>
-          {[0,.5,1].map(f=><line key={f} x1={P} x2={W-P} y1={P+f*(H-2*P)} y2={P+f*(H-2*P)} stroke="#eef2f1"/>)}
-          <path d={path} fill="none" stroke="var(--teal)" strokeWidth="2.5"/>
-          {coords.map((c,i)=><circle key={i} cx={c.x} cy={c.y} r="4.5" fill={c.v.alerta?"var(--red)":"var(--teal)"} stroke="#fff" strokeWidth="2"/>)}
-        </svg>}
-        {pts.length>0 && <div className="between" style={{marginTop:4}}>
-          <span className="muted" style={{fontSize:11}}>{lista[0].data.split(" ")[0].slice(5)}</span>
-          <span className="muted" style={{fontSize:11}}>mín {min} · máx {max}</span>
-          <span className="muted" style={{fontSize:11}}>{lista[lista.length-1].data.split(" ")[0].slice(5)}</span>
-        </div>}
-      </div>
-
-      <div className="sec-title">Medições registradas</div>
-      {lista.slice().reverse().map(v=>
-        <div key={v.id} className="card" style={{marginBottom:8,borderColor:v.alerta?"#fecaca":"var(--line)"}}>
-          <div className="between">
-            <div><b style={{fontSize:17,color:v.alerta?"var(--red)":"var(--ink)"}}>{v.valor} <span style={{fontSize:12,fontWeight:400}} className="muted">{v.unidade}</span></b>
-              <div className="muted" style={{fontSize:13}}>{v.data}</div></div>
-            {v.alerta? <span className="pill red">🔴 Alterado</span> : <span className="pill green">✓ Normal</span>}
-          </div>
-        </div>)}
-      {lista.length===0 && <div className="card"><p className="muted" style={{textAlign:"center"}}>Nenhuma medição.</p></div>}
-      <div style={{height:20}}/>
-    </div>
-  </div>;
-}
-
-/* ============ CRONOGRAMA (IMPRESSÃO) ============ */
-function Cronograma({ctx}){
-  const {meds,pacientes,pacienteAtivo,pop} = ctx;
-  const pac=pacientes.find(p=>p.id===pacienteAtivo);
-  const [periodo,setPeriodo]=useState("Semanal");
-  const lista=meds.filter(m=>m.pacienteId===pacienteAtivo);
-  const horarios=[...new Set(lista.flatMap(m=>m.horarios))].sort();
-
-  return <div className="scroll">
-    <Top title="Cronograma" onBack={pop} action={{label:"🖨️ Imprimir", onClick:()=>window.print()}} />
-    <div className="pad no-print">
-      <div className="tabs">{["Semanal","Mensal"].map(t=><button key={t} className={periodo===t?"on":""} onClick={()=>setPeriodo(t)}>{t}</button>)}</div>
-      <div className="card" style={{marginBottom:14}}>
-        <div className="row"><div className="ava">{pac.foto}</div><div><b>{pac.nome}</b><div className="muted" style={{fontSize:13}}>{pac.idade} anos · Cronograma {periodo.toLowerCase()}</div></div></div>
-      </div>
-      <CronTable lista={lista} horarios={horarios} />
-      <button className="btn" style={{marginTop:16}} onClick={()=>window.print()}>🖨️ Imprimir / Salvar PDF</button>
-      <p className="muted" style={{fontSize:12,textAlign:"center",marginTop:10}}>Use "Salvar como PDF" na janela de impressão para exportar.</p>
-      <div style={{height:20}}/>
-    </div>
-
-    {/* área de impressão */}
-    <div id="printArea" style={{padding:30,fontFamily:"Inter,sans-serif",color:"#111"}}>
-      <div style={{borderBottom:"3px solid #0e9488",paddingBottom:12,marginBottom:18}}>
-        <h1 style={{color:"#0b766c",fontSize:24}}>🩺 PJ Cuidador</h1>
-        <p style={{fontSize:13,color:"#555"}}>Cronograma {periodo} de Medicações</p>
-      </div>
-      <table style={{width:"100%",fontSize:13,marginBottom:20}}><tbody>
-        <tr><td style={{padding:4}}><b>Paciente:</b> {pac.nome}</td><td style={{padding:4}}><b>Idade:</b> {pac.idade} anos</td></tr>
-        <tr><td style={{padding:4}}><b>Condições:</b> {pac.condicoes.join(", ")}</td><td style={{padding:4}}><b>Alergias:</b> {pac.alergias.join(", ")}</td></tr>
-        <tr><td style={{padding:4}}><b>Emitido em:</b> 12/06/2026</td><td style={{padding:4}}><b>Período:</b> {periodo}</td></tr>
-      </tbody></table>
-      <CronTable lista={lista} horarios={horarios} print />
-      <p style={{fontSize:11,color:"#888",marginTop:24,borderTop:"1px solid #ddd",paddingTop:10}}>Documento gerado pelo app PJ Cuidador. Em caso de dúvidas, consulte o médico ou farmacêutico responsável.</p>
-    </div>
-  </div>;
-}
-function CronTable({lista,horarios,print}){
-  const bd = print? "1px solid #999":"1px solid var(--line)";
-  return <div style={{overflowX:"auto"}}>
-    <table style={{width:"100%",borderCollapse:"collapse",fontSize:13,background:print?"#fff":"transparent"}}>
-      <thead><tr style={{background:print?"#e6f7f4":"var(--teal-bg)"}}>
-        <th style={{border:bd,padding:"8px 6px",textAlign:"left"}}>Horário</th>
-        <th style={{border:bd,padding:"8px 6px",textAlign:"left"}}>Medicamento</th>
-        <th style={{border:bd,padding:"8px 6px",textAlign:"left"}}>Dose / Via</th>
-      </tr></thead>
-      <tbody>
-        {horarios.length===0 && <tr><td colSpan="3" style={{border:bd,padding:12,textAlign:"center",color:"#888"}}>Nenhum medicamento cadastrado.</td></tr>}
-        {horarios.map(h=>{
-          const ms=lista.filter(m=>m.horarios.includes(h));
-          return ms.map((m,i)=><tr key={h+m.id}>
-            {i===0 && <td rowSpan={ms.length} style={{border:bd,padding:"8px 6px",fontWeight:700,verticalAlign:"top",background:print?"#f6fbfa":"#fafdfc"}}>{h}</td>}
-            <td style={{border:bd,padding:"8px 6px"}}><b>{m.nome}</b> {m.dosagem}</td>
-            <td style={{border:bd,padding:"8px 6px"}}>{m.forma} · {m.via}</td>
-          </tr>);
-        })}
-      </tbody>
-    </table>
-  </div>;
-}
-
-/* ============ LOJA ============ */
-function Loja({ctx}){
-  const {cart,setCart,push,showToast} = ctx;
-  const [cat,setCat]=useState("Todos");
-  const cats=["Todos",...new Set(PRODUTOS.map(p=>p.cat))];
-  const lista=cat==="Todos"?PRODUTOS:PRODUTOS.filter(p=>p.cat===cat);
-  const add=(p)=>{
-    const ex=cart.find(c=>c.id===p.id);
-    setCart(ex? cart.map(c=>c.id===p.id?{...c,qtd:c.qtd+1}:c) : [...cart,{...p,qtd:1}]);
-    showToast(p.nome.slice(0,18)+"… no carrinho");
-  };
-  const count=cart.reduce((a,c)=>a+c.qtd,0);
-  return <div>
-    <Top title="Farmácia" action={count?{label:`🛒 ${count}`, onClick:()=>push("carrinho")}:null} />
-    <div className="pad">
-      <div className="card" style={{background:"linear-gradient(120deg,#0e9488,#0b766c)",color:"#fff",border:"none"}}>
-        <b style={{fontSize:16}}>🚚 Entrega para todo o Brasil</b>
-        <p style={{opacity:.9,fontSize:13,marginTop:4}}>Produtos de farmácias parceiras com preço especial para cuidadores.</p>
-      </div>
-      <div className="scrollx" style={{margin:"14px 0"}}>
-        {cats.map(c=><div key={c} className={"chip "+(cat===c?"on":"")} onClick={()=>setCat(c)}>{c}</div>)}
-      </div>
-      <div className="grid2">
-        {lista.map(p=>
-          <div key={p.id} className="prod">
-            <div className="img">{p.emoji}</div>
-            <div style={{padding:"10px 11px"}}>
-              <div style={{fontSize:13,fontWeight:600,lineHeight:1.3,minHeight:34}}>{p.nome}</div>
-              <div className="muted" style={{fontSize:11,marginTop:2}}>{p.farm}</div>
-              <div className="between" style={{marginTop:8}}>
-                <b style={{color:"var(--teal-d)"}}>R$ {p.preco.toFixed(2)}</b>
-                <button className="btn sm" onClick={()=>add(p)} style={{padding:"7px 11px"}}>+</button>
-              </div>
-            </div>
-          </div>)}
-      </div>
-      <div style={{height:90}}/>
-    </div>
-    {count>0 && <button className="fab no-print" style={{width:"auto",borderRadius:30,padding:"0 22px",fontSize:15,fontWeight:700,gap:8}} onClick={()=>push("carrinho")}>🛒 {count} · R$ {cart.reduce((a,c)=>a+c.preco*c.qtd,0).toFixed(2)}</button>}
-  </div>;
-}
-
-/* ============ CARRINHO ============ */
-function Carrinho({ctx}){
-  const {cart,setCart,pop,showToast} = ctx;
-  const setQtd=(id,d)=> setCart(cart.map(c=>c.id===id?{...c,qtd:Math.max(1,c.qtd+d)}:c));
-  const rem=(id)=>setCart(cart.filter(c=>c.id!==id));
-  const sub=cart.reduce((a,c)=>a+c.preco*c.qtd,0);
-  const frete=sub>0?12.90:0;
-  const finalizar=()=>{ setCart([]); showToast("✅ Pedido confirmado!"); pop(); };
-  return <div className="scroll">
-    <Top title="Carrinho" onBack={pop} />
-    <div className="pad">
-      {cart.length===0 && <div className="card"><p className="muted" style={{textAlign:"center",padding:"20px 0"}}>🛒 Seu carrinho está vazio.</p></div>}
-      {cart.map(c=>
-        <div key={c.id} className="card" style={{marginBottom:10}}>
-          <div className="row">
-            <div style={{fontSize:34}}>{c.emoji}</div>
-            <div style={{flex:1}}>
-              <b style={{fontSize:14}}>{c.nome}</b>
-              <div className="muted" style={{fontSize:12}}>{c.farm}</div>
-              <b style={{color:"var(--teal-d)"}}>R$ {(c.preco*c.qtd).toFixed(2)}</b>
-            </div>
-            <div style={{textAlign:"center"}}>
-              <div className="row" style={{gap:6}}>
-                <button className="btn sm line" style={{padding:"4px 10px"}} onClick={()=>setQtd(c.id,-1)}>−</button>
-                <b style={{minWidth:18,textAlign:"center"}}>{c.qtd}</b>
-                <button className="btn sm line" style={{padding:"4px 10px"}} onClick={()=>setQtd(c.id,1)}>+</button>
-              </div>
-              <span style={{fontSize:11,color:"var(--red)",cursor:"pointer"}} onClick={()=>rem(c.id)}>remover</span>
-            </div>
-          </div>
-        </div>)}
-
-      {cart.length>0 && <>
-        <div className="card" style={{marginTop:6}}>
-          <div className="field" style={{marginBottom:10}}><label>📍 Endereço de entrega</label><input className="input" defaultValue="Rua das Flores, 123 - São Paulo/SP"/></div>
-          <div className="field" style={{marginBottom:0}}><label>💳 Forma de pagamento</label><select><option>Cartão de crédito •••• 4821</option><option>Pix</option><option>Boleto</option></select></div>
-        </div>
-        <div className="card" style={{marginTop:12}}>
-          <div className="between" style={{fontSize:14}}><span className="muted">Subtotal</span><span>R$ {sub.toFixed(2)}</span></div>
-          <div className="between" style={{fontSize:14,marginTop:6}}><span className="muted">Frete</span><span>R$ {frete.toFixed(2)}</span></div>
-          <div className="between" style={{marginTop:10,paddingTop:10,borderTop:"1px solid var(--line)",fontSize:17,fontWeight:800}}><span>Total</span><span style={{color:"var(--teal-d)"}}>R$ {(sub+frete).toFixed(2)}</span></div>
-        </div>
-        <button className="btn" style={{marginTop:14}} onClick={finalizar}>Finalizar compra</button>
-        <p className="muted" style={{fontSize:11,textAlign:"center",marginTop:10}}>🔒 Pagamento seguro · Rastreamento em "Meus Pedidos"</p>
-      </>}
-      <div style={{height:20}}/>
-    </div>
-  </div>;
-}
-
-/* ============ BOTTOM NAV ============ */
-function BottomNav({tab,setTab,cartCount}){
-  const items=[
-    {k:"home",ic:"🏠",l:"Início"},
-    {k:"meds",ic:"💊",l:"Medicações"},
-    {k:"vitais",ic:"🫀",l:"Sinais"},
-    {k:"loja",ic:"🛒",l:"Farmácia"},
-    {k:"pacientes",ic:"👥",l:"Pacientes"},
-  ];
-  return <div className="nav no-print">
-    {items.map(it=>
-      <button key={it.k} className={tab===it.k?"on":""} onClick={()=>setTab(it.k)} style={{position:"relative"}}>
-        <span className="ic">{it.ic}</span>{it.l}
-        {it.k==="loja" && cartCount>0 && <span className="badge">{cartCount}</span>}
-      </button>)}
-  </div>;
-}
-
-const _err = document.getElementById("loadErr");
-if(_err) _err.remove();
-ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
-</script>
-<script>
-/* Rede de segurança: se React/Babel não carregarem (sem internet, CDN bloqueada),
-   mostra um aviso em vez de tela branca. */
-window.addEventListener("load", function(){
-  if(typeof React === "undefined" || typeof Babel === "undefined"){
-    var e = document.getElementById("loadErr");
-    if(e) e.style.display = "block";
-  }
-});
-</script>
+  <script src="script.js"></script>
 </body>
 </html>

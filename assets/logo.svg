@@ -1,0 +1,26 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="LegisCidade">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f9d8a"/>
+      <stop offset="1" stop-color="#0a7c6e"/>
+    </linearGradient>
+  </defs>
+  <!-- rounded badge -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#lg)"/>
+
+  <!-- municipal building base -->
+  <rect x="16" y="44" width="32" height="4" rx="1" fill="#ffffff"/>
+  <rect x="20" y="30" width="3" height="14" fill="#ffffff"/>
+  <rect x="27" y="30" width="3" height="14" fill="#ffffff"/>
+  <rect x="34" y="30" width="3" height="14" fill="#ffffff"/>
+  <rect x="41" y="30" width="3" height="14" fill="#ffffff"/>
+  <!-- pediment -->
+  <path d="M32 18 L48 28 H16 Z" fill="#ffffff"/>
+
+  <!-- scales of justice over the pediment -->
+  <rect x="31" y="10" width="2" height="10" rx="1" fill="#cdfff3"/>
+  <circle cx="32" cy="9" r="2.4" fill="#cdfff3"/>
+  <rect x="22" y="13" width="20" height="2" rx="1" fill="#cdfff3"/>
+  <path d="M24 15 L20 22 H28 Z" fill="#cdfff3" fill-opacity="0.9"/>
+  <path d="M40 15 L36 22 H44 Z" fill="#cdfff3" fill-opacity="0.9"/>
+</svg>
